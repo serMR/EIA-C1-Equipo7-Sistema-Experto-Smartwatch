@@ -28,4 +28,10 @@ public class CargadorSmartwatch {
 		this.diferencialPotencial = diferencialPotencial;
 	}
 
+	@Override
+	public String toString() {
+		return "CargadorSmartwatch [nivelDiferencialPotencial=" + nivelDiferencialPotencial + ", diferencialPotencial="
+				+ diferencialPotencial + "]";
+	}
+
 }

@@ -27,4 +27,11 @@ public class PinCarga {
 	public void setDiferencialPotencialPin(Double diferencialPotencialPin) {
 		this.diferencialPotencialPin = diferencialPotencialPin;
 	}
+
+	@Override
+	public String toString() {
+		return "PinCarga [estadoPinDeCarga=" + estadoPinDeCarga + ", diferencialPotencialPin=" + diferencialPotencialPin
+				+ "]";
+	}
+
 }

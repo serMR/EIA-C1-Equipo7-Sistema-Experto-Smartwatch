@@ -15,4 +15,9 @@ public class ModuloBluetooth {
 		this.permiteEmparejamiento = permiteEmparejamiento;
 	}
 
+	@Override
+	public String toString() {
+		return "ModuloBluetooth [permiteEmparejamiento=" + permiteEmparejamiento + "]";
+	}
+
 }

@@ -25,7 +25,6 @@ public class TestCaseUtils {
 	}
 
 	public static void print(Smartwatch smartwatch) {
-
 		Bateria bateria = smartwatch.getBateria();
 		PinCarga pinCarga = smartwatch.getPinCarga();
 		Pantalla pantalla = smartwatch.getPantalla();

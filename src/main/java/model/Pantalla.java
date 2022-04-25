@@ -35,4 +35,10 @@ public class Pantalla {
 		this.touchscreen = touchscreen;
 	}
 
+	@Override
+	public String toString() {
+		return "Pantalla [estado=" + estado + ", presentaGolpes=" + presentaGolpes + ", touchscreen=" + touchscreen
+				+ "]";
+	}
+
 }

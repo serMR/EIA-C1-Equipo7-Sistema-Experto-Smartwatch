@@ -31,7 +31,7 @@ public class SmartwatchTestCases {
 	}
 
 	private void prepareKnowledgeSession() {
-		sessionStatefull = KnowledgeSessionHelper.getStatefulKnowledgeSessionWithCallback(kieContainer, K_SESSION_NAME);        
+		sessionStatefull = KnowledgeSessionHelper.getStatefulKnowledgeSessionWithCallback(kieContainer, K_SESSION_NAME);
 		Agenda agenda = sessionStatefull.getAgenda();
 		// En primer lugar, se tiene la ultima fase de reglas a ejecutar
 		agenda.getAgendaGroup("Prescripcion de falla de smartwatch").setFocus();
