@@ -1,0 +1,227 @@
+//created on: 24 abr. 2022
+package SmartwatchRules
+
+import model.*;
+
+//list any import classes here.
+
+//declare any global variables here
+
+rule "R01 - Nivel Bateria Baja"
+lock-on-active agenda-group "Diagnostico Bateria"
+	when
+    	$smartwatch: Smartwatch(
+    		bateria.capacidadPorcentual <= 15,
+    		recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.NoDeterminado) 
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setNivelBateria(NivelBateria.Baja); 
+    	}
+end
+
+rule "R02 - Nivel Bateria Media"
+lock-on-active agenda-group "Diagnostico Bateria"
+	when
+    	$smartwatch: Smartwatch(
+    		bateria.capacidadPorcentual > 15,
+    		bateria.capacidadPorcentual <= 70
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setNivelBateria(NivelBateria.Media); 
+    	}
+end
+
+rule "R03 - Nivel Bateria Alta"
+lock-on-active agenda-group "Diagnostico Bateria"
+	when
+    	$smartwatch: Smartwatch(
+    		bateria.capacidadPorcentual > 70,
+    		bateria.capacidadPorcentual <= 100
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setNivelBateria(NivelBateria.Alta);
+    	}
+end
+
+rule "R04 - Diferencia de potencial del cargador Deficiente"
+lock-on-active agenda-group "Diagnostico Cargador"
+	when
+    	$smartwatch: Smartwatch(
+    		cargador.diferencialPotencial <= 4
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setDiferencialPotencialCargador(DiferencialPotencialCargador.Deficiente);
+    	}
+end
+
+rule "R05 - Diferencia de potencial del cargador Optimo"
+lock-on-active agenda-group "Diagnostico Cargador"
+	when
+    	$smartwatch: Smartwatch(
+    		cargador.diferencialPotencial > 4,
+    		cargador.diferencialPotencial < 5
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setDiferencialPotencialCargador(DiferencialPotencialCargador.Optimo);
+    	}
+end
+
+rule "R06 - Diferencia de potencial del pin - Dañado"
+lock-on-active agenda-group "Diagnostico Pin de Carga"
+	when
+    	$smartwatch: Smartwatch(
+    		pinCarga.diferencialPotencialPin <= 4
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setEstadoPinCarga(EstadoPinCarga.Daniado);
+    	}
+end
+
+rule "R07 - Diferencia de potencial del pin - Normal"
+lock-on-active agenda-group "Diagnostico Pin de Carga"
+	when
+    	$smartwatch: Smartwatch(
+    		pinCarga.diferencialPotencialPin > 4,
+    		pinCarga.diferencialPotencialPin <= 5
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setEstadoPinCarga(EstadoPinCarga.Normal);
+    	}
+end
+
+rule "R08 - Diagnostico de pantalla rota del smartwatch"
+lock-on-active agenda-group "Diagnostico Pantalla"
+	when
+    	$smartwatch: Smartwatch(
+    		sistemaOperativo.interfaz.isa(SOInterfaz.SinRespuesta),
+			pantalla.touchscreen.isa(PantallaTouchscreen.NoDaniado),
+			pantalla.estado.isa(PantallaEstado.Apagado),
+			pantalla.presentaGolpes == true
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPantalla.setResultado(ResultadoDiagnosticoPantalla.PantallaRota);
+    	}
+end
+
+rule "R09 - Diagnostico de touchscreen dañado del smartwatch"
+lock-on-active agenda-group "Diagnostico Pantalla"
+	when
+    	$smartwatch: Smartwatch(
+    		sistemaOperativo.interfaz.isa(SOInterfaz.ImagenNormal),
+			pantalla.touchscreen.isa(PantallaTouchscreen.Daniado),
+			pantalla.estado.isa(PantallaEstado.Prendida),
+			pantalla.presentaGolpes == false
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPantalla.setResultado(ResultadoDiagnosticoPantalla.TouchScreenDaniado);
+    	}
+end
+
+
+rule "R10 - Diagnostico de funcionamiento de modulo bluetooth"
+lock-on-active agenda-group "Diagnostico Modulo Bluetooth"
+	when
+    	$smartwatch: Smartwatch(
+    		sistemaOperativo.interfaz.isa(SOInterfaz.ImagenNormal),
+    		bateria.nivelBateria.isa(NivelBateria.Alta),
+    		sistemaOperativo.velocidadRespuesta.isa(SOVelocidadRespuesta.Normal),
+    		moduloBluetooth.permiteEmparejamiento == false
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoSensores.setResultado(ResultadoDiagnosticoSensores.ModuloBluetoothDaniado);
+    	}
+end
+
+rule "R11 - Diagnostico del booteo del sistema operativo"
+lock-on-active agenda-group "Diagnostico Sistema Operativo"
+	when
+    	$smartwatch: Smartwatch(
+    		sistemaOperativo.interfaz.isa(SOInterfaz.SinImagen),
+    		sistemaOperativo.velocidadRespuesta.isa(SOVelocidadRespuesta.Normal),
+    		sistemaOperativo.arranque.isa(SOArranque.Normal),
+    		bateria.nivelBateria.isa(NivelBateria.Alta)
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoSO.setResultado(ResultadoDiagnosticoSO.ErrorBooteoSistema);
+    	}
+end
+
+rule "R12 - Diagnostico de performance del sistema operativo"
+lock-on-active agenda-group "Diagnostico Sistema Operativo"
+	when
+    	$smartwatch: Smartwatch(
+    		sistemaOperativo.interfaz.isa(SOInterfaz.ImagenNormal),
+    		sistemaOperativo.velocidadRespuesta.isa(SOVelocidadRespuesta.Lenta),
+    		sistemaOperativo.arranque.isa(SOArranque.Normal),
+    		bateria.nivelBateria.isa(NivelBateria.Alta)
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoSO.setResultado(ResultadoDiagnosticoSO.VelocidadLentaPorSaturacionMemoria);
+    	}
+end
+
+rule "R13 - Diagnostico preliminar de la bateria"
+lock-on-active agenda-group "Diagnostico Preliminar"
+	when
+    	$smartwatch: Smartwatch(
+    		 recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.Baja),
+    		 recomendacion.diagnosticoPreliminar.estadoPinCarga.isa(EstadoPinCarga.Normal),
+    		 recomendacion.diagnosticoPreliminar.diferencialPotencialCargador.isa(DiferencialPotencialCargador.Optimo)
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setResultado(ResultadoDiagnosticoPreliminar.BateriaBaja);
+    	}
+end
+
+rule "R14 - Diagnostico preliminar del cargador"
+lock-on-active agenda-group "Diagnostico Preliminar"
+	when
+    	$smartwatch: Smartwatch(
+    		 recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.Alta),
+    		 recomendacion.diagnosticoPreliminar.estadoPinCarga.isa(EstadoPinCarga.Normal),
+    		 recomendacion.diagnosticoPreliminar.diferencialPotencialCargador.isa(DiferencialPotencialCargador.Deficiente)
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setResultado(ResultadoDiagnosticoPreliminar.VoltajeInsuficiente);
+    	}
+end
+
+rule "R15 - Diagnostico preliminar del pin"
+lock-on-active agenda-group "Diagnostico Preliminar"
+	when
+    	$smartwatch: Smartwatch(
+    		 recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.Alta),
+    		 recomendacion.diagnosticoPreliminar.estadoPinCarga.isa(EstadoPinCarga.Daniado),
+    		 recomendacion.diagnosticoPreliminar.diferencialPotencialCargador.isa(DiferencialPotencialCargador.Optimo)
+    	)
+    then
+    	modify($smartwatch) {
+    	   recomendacion.diagnosticoPreliminar.setResultado(ResultadoDiagnosticoPreliminar.PinCargaDaniado);
+    	}
+end
+
+rule "R16 - Recomendacion Cargar Bateria"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoPreliminar.resultado.isa(ResultadoDiagnosticoPreliminar.BateriaBaja),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.CargarBateria); 
+end
+
