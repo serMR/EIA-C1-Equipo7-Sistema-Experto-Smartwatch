@@ -35,6 +35,12 @@ public class SistemaOperativo {
 	public void setVelocidadRespuesta(SOVelocidadRespuesta velocidadRespuesta) {
 		this.velocidadRespuesta = velocidadRespuesta;
 	}
+
+	@Override
+	public String toString() {
+		return "SistemaOperativo [arranque=" + arranque + ", interfaz=" + interfaz + ", velocidadRespuesta="
+				+ velocidadRespuesta + "]";
+	}
 	
 	
 }
