@@ -16,8 +16,6 @@ import utils.KnowledgeSessionHelper;
 
 public class SmartwatchTestCases {
 
-	// Buscar archivo kmodule.xml. El nombre de la sesion debe ser igual al
-	// configurado en ese archivo
 	String K_SESSION_NAME = "ksession-smartwatch-tests";
 
 	KieSession sessionStatefull;
@@ -33,7 +31,6 @@ public class SmartwatchTestCases {
 	private void prepareKnowledgeSession() {
 		sessionStatefull = KnowledgeSessionHelper.getStatefulKnowledgeSessionWithCallback(kieContainer, K_SESSION_NAME);
 		Agenda agenda = sessionStatefull.getAgenda();
-		// En primer lugar, se tiene la ultima fase de reglas a ejecutar
 		agenda.getAgendaGroup("Prescripcion de falla de smartwatch").setFocus();
 		agenda.getAgendaGroup("Diagnostico Sistema Operativo").setFocus();
 		agenda.getAgendaGroup("Diagnostico Preliminar").setFocus();
