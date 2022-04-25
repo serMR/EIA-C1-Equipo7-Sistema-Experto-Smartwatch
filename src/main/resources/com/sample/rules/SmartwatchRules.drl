@@ -100,10 +100,11 @@ rule "R08 - Diagnostico de pantalla rota del smartwatch"
 lock-on-active agenda-group "Diagnostico Pantalla"
 	when
     	$smartwatch: Smartwatch(
-    		sistemaOperativo.interfaz.isa(SOInterfaz.SinRespuesta),
-			pantalla.touchscreen.isa(PantallaTouchscreen.NoDaniado),
-			pantalla.estado.isa(PantallaEstado.Apagado),
-			pantalla.presentaGolpes == true
+    		pantalla.touchscreen.isa(PantallaTouchscreen.NoDaniado),
+    		pantalla.estado.isa(PantallaEstado.Apagado),
+    		pantalla.presentaGolpes == true,
+    		recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.Alta),
+			sistemaOperativo.interfaz.isa(SOInterfaz.SinRespuesta)
     	)
     then
     	modify($smartwatch) {
@@ -132,8 +133,8 @@ lock-on-active agenda-group "Diagnostico Modulo Bluetooth"
 	when
     	$smartwatch: Smartwatch(
     		sistemaOperativo.interfaz.isa(SOInterfaz.ImagenNormal),
-    		bateria.nivelBateria.isa(NivelBateria.Alta),
     		sistemaOperativo.velocidadRespuesta.isa(SOVelocidadRespuesta.Normal),
+		 	recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.Alta),
     		moduloBluetooth.permiteEmparejamiento == false
     	)
     then
@@ -149,7 +150,7 @@ lock-on-active agenda-group "Diagnostico Sistema Operativo"
     		sistemaOperativo.interfaz.isa(SOInterfaz.SinImagen),
     		sistemaOperativo.velocidadRespuesta.isa(SOVelocidadRespuesta.Normal),
     		sistemaOperativo.arranque.isa(SOArranque.Normal),
-    		bateria.nivelBateria.isa(NivelBateria.Alta)
+		 	recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.Alta)
     	)
     then
     	modify($smartwatch) {
@@ -164,7 +165,7 @@ lock-on-active agenda-group "Diagnostico Sistema Operativo"
     		sistemaOperativo.interfaz.isa(SOInterfaz.ImagenNormal),
     		sistemaOperativo.velocidadRespuesta.isa(SOVelocidadRespuesta.Lenta),
     		sistemaOperativo.arranque.isa(SOArranque.Normal),
-    		bateria.nivelBateria.isa(NivelBateria.Alta)
+		 	recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.Alta)
     	)
     then
     	modify($smartwatch) {
@@ -225,3 +226,79 @@ lock-on-active agenda-group "Prescripcion de falla de smartwatch"
     	$smartwatch.recomendacion.setAccion(AccionRecomendada.CargarBateria); 
 end
 
+rule "R17 - Recomendacion Cambiar cargador"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoPreliminar.resultado.isa(ResultadoDiagnosticoPreliminar.VoltajeInsuficiente),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.CambiarCargador); 
+end
+
+rule "R18 - Recomendacion Cambiar pin de carga"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoPreliminar.resultado.isa(ResultadoDiagnosticoPreliminar.PinCargaDaniado),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.CambiarPinCarga); 
+end
+
+rule "R19 - Recomendacion Reiniciar SO a fabrica por error de booteo"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoSO.resultado.isa(ResultadoDiagnosticoSO.ErrorBooteoSistema),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.ResetearSOFabrica); 
+end
+
+rule "R20 - Recomendacion Reiniciar SO a fabrica por error de performance"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoSO.resultado.isa(ResultadoDiagnosticoSO.VelocidadLentaPorSaturacionMemoria),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.ResetearSOFabrica); 
+end
+
+rule "R21 - Recomendacion cambiar pantalla por display daño"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoPantalla.resultado.isa(ResultadoDiagnosticoPantalla.PantallaRota),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.CambiarPantalla); 
+end
+
+rule "R22 - Recomendacion cambiar pantalla por touch dañado"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoPantalla.resultado.isa(ResultadoDiagnosticoPantalla.TouchScreenDaniado),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.CambiarPantalla); 
+end
+
+rule "R23 - Recomendacion cambiar modulo de bluetooth"
+lock-on-active agenda-group "Prescripcion de falla de smartwatch"
+	when
+    	$smartwatch: Smartwatch(
+			recomendacion.diagnosticoSensores.resultado.isa(ResultadoDiagnosticoSensores.ModuloBluetoothDaniado),
+        	recomendacion.accion.isa(AccionRecomendada.NoEncontrada)
+        )
+    then
+    	$smartwatch.recomendacion.setAccion(AccionRecomendada.ReempleazarModBluetooth); 
+end
