@@ -25,7 +25,8 @@ lock-on-active agenda-group "Diagnostico Bateria"
 	when
     	$smartwatch: Smartwatch(
     		bateria.capacidadPorcentual > 15,
-    		bateria.capacidadPorcentual <= 70
+    		bateria.capacidadPorcentual <= 70,
+    		recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.NoDeterminado) 
     	)
     then
     	modify($smartwatch) {
@@ -38,7 +39,8 @@ lock-on-active agenda-group "Diagnostico Bateria"
 	when
     	$smartwatch: Smartwatch(
     		bateria.capacidadPorcentual > 70,
-    		bateria.capacidadPorcentual <= 100
+    		bateria.capacidadPorcentual <= 100,
+    		recomendacion.diagnosticoPreliminar.nivelBateria.isa(NivelBateria.NoDeterminado) 
     	)
     then
     	modify($smartwatch) {
@@ -63,7 +65,7 @@ lock-on-active agenda-group "Diagnostico Cargador"
 	when
     	$smartwatch: Smartwatch(
     		cargador.diferencialPotencial > 4,
-    		cargador.diferencialPotencial < 5
+    		cargador.diferencialPotencial <= 5
     	)
     then
     	modify($smartwatch) {
